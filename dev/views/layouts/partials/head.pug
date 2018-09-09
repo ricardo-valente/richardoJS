@@ -1,0 +1,7 @@
+head
+	title #{app.title}
+	include head/browser_meta.pug
+	//- include head/favicon.pug
+	//- include head/social_meta.pug
+	- const envExt = (app.env === 'prod') ? '.min' : ''
+	link(rel='stylesheet', type='text/css', href= `${dir('static/styles').url}/styles-${app.version}${envExt}.css`)

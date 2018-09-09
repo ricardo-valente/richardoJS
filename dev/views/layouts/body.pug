@@ -1,0 +1,6 @@
+doctype html
+html(lang='en-US' prefix='og: http://ogp.me/ns#')
+  include partials/head.pug
+  body(class=`${title}${showTopBar}`, data-page=`${title}`, data-version=`${app.version}`, data-breakpoint='')
+    h1 #{app.title}
+    include partials/footer.pug
