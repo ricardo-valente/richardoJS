@@ -63,16 +63,16 @@ function styles() {
 function scripts() {
   concat-cli\
     --files dev/static/scripts/**/*.js\
-    --output dev/static/scripts/scripts-$npm_package_version.js
+    --output dev/static/scripts/richardo-$npm_package_version.js
   babel\
     dev/static/scripts/scripts-$npm_package_version.js\
-    --out-file app/static/scripts/scripts-$npm_package_version.js
+    --out-file app/static/scripts/richardo-$npm_package_version.js
   if [[ $ENV == 'prod' ]]; then
     minify\
-      app/static/scripts/scripts-$npm_package_version.js\
+      app/static/scripts/richardo-$npm_package_version.js\
       --mangle.keepClassName\
       --deadcode.keepFnArgs\
-      --outFile app/static/scripts/scripts-$npm_package_version.min.js
+      --outFile app/static/scripts/richardo-$npm_package_version.min.js
   fi;
   echo "Scripts built!"
 }
