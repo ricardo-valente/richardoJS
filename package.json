@@ -31,9 +31,15 @@
   "scripts": {
     "setup": "bash ./bash/run setup",
     "build:server": "bash ./bash/run server",
+    "build:views": "bash ./bash/run build 'views'",
+    "build:styles": "bash ./bash/run styles",
+    "build:scripts": "bash ./bash/run scripts",
     "serve:node": "bash ./bash/run serveNode",
     "serve:browsersync": "bash ./bash/run serveBrowsersync",
     "onchange:server": "bash ./bash/run onChange '/' 'server' 'js'",
+    "onchange:views": "bash ./bash/run onChange '/' 'views' 'pug'",
+    "onchange:styles": "bash ./bash/run onChange 'static' 'styles' 'scss'",
+    "onchange:scripts": "bash ./bash/run onChange 'static' 'scripts' 'js' 'dev/static/scripts/scripts-*.js'",
     "watch": "run-p serve:* onchange:*",
     "start": "bash ./bash/run start"
   },
