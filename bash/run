@@ -52,7 +52,7 @@ function server() {
 function styles() {
   node-sass\
     --output-style $STYLES_OUTPUT_STYLE\
-    dev/static/styles/style.scss\
+    dev/static/styles/styles.scss\
     app/static/styles/$STYLES_OUTPUT_FILE
   postcss\
     --use autoprefixer\
