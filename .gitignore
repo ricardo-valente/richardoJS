@@ -1,0 +1,19 @@
+node_modules
+bower_components
+.tmp
+.idea
+.DS_Store
+
+
+# Dotenv
+.env
+.env.*
+
+yarn.lock
+package-lock.json
+*.log
+
+**/richardo-*.js
+app
+
+*.code-workspace
