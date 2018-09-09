@@ -1,0 +1,13 @@
+version: '3.1'
+services:
+  app:
+    container_name: richardojs
+    build: .
+    volumes:
+      - .:/usr/web/
+      - /usr/web/node_modules/
+    ports:
+      - "${PORT}:${PORT}"
+      - "4011:4011"
+      - "4012:4012"
+    restart: always

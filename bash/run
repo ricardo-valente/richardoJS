@@ -1,0 +1,136 @@
+#!/usr/bin/env sh
+
+export PATH=./node_modules/.bin:$PATH
+
+set -a
+source .env
+set +a
+
+if [[ $ENV == 'dev' ]]; then
+  START_CMD=watch
+  SERVE_CMD='supervisor --watch dev/server'
+else
+  START_CMD=serve:node
+  SERVE_CMD=node
+fi;
+
+if [[ $ENV == 'prod' ]]; then
+STYLES_OUTPUT_STYLE=compressed
+  STYLES_OUTPUT_FILE=styles-$npm_package_version.min.css
+else
+STYLES_OUTPUT_STYLE=nested
+  STYLES_OUTPUT_FILE=styles-$npm_package_version.css
+fi;
+
+function setup() {
+  rm -rf app
+  mkdir -p\
+   app/static/scripts\
+   app/static/assets\
+   app/static/styles\
+   app/views
+  touch app/static/scripts/scripts-$npm_package_version.js
+  if [[ $ENV == 'prod' ]]; then
+    touch app/static/styles/$STYLES_OUTPUT_FILE
+  fi;
+}
+
+function server() {
+  babel\
+    dev/server\
+    --out-dir app/server
+  if [[ $ENV == 'prod' ]]; then
+    minify\
+      app/server\
+      --mangle.keepClassName\
+      --deadcode.keepFnArgs\
+      --out-dir app/server
+  fi;
+  echo "Server built!"
+}
+
+function styles() {
+  node-sass\
+    --output-style $STYLES_OUTPUT_STYLE\
+    dev/static/styles/style.scss\
+    app/static/styles/$STYLES_OUTPUT_FILE
+  postcss\
+    --use autoprefixer\
+    --output app/static/styles/$STYLES_OUTPUT_FILE app/static/styles/$STYLES_OUTPUT_FILE
+  echo "Styles built!"
+}
+
+function scripts() {
+  concat-cli\
+    --files dev/static/scripts/**/*.js\
+    --output dev/static/scripts/scripts-$npm_package_version.js
+  babel\
+    dev/static/scripts/scripts-$npm_package_version.js\
+    --out-file app/static/scripts/scripts-$npm_package_version.js
+  if [[ $ENV == 'prod' ]]; then
+    minify\
+      app/static/scripts/scripts-$npm_package_version.js\
+      --mangle.keepClassName\
+      --deadcode.keepFnArgs\
+      --outFile app/static/scripts/scripts-$npm_package_version.min.js
+  fi;
+  echo "Scripts built!"
+}
+
+function build() {
+  rimraf app/$1/
+  cp -r\
+    dev/$1/\
+    app/$1/
+  echo "${1^} built!"
+}
+
+function onChange() {
+  if [[ $1 == '/' ]]; then
+    DIR=$1
+  else
+    DIR="/$1/"
+  fi;
+  if [[ $3 == '' ]]; then
+    EXT='*'
+  else
+    EXT=$3
+  fi;
+  if [[ $4 == '' ]]; then
+    EXCLUDE='--no-exclude'
+  else
+    EXCLUDE="--exclude ${4}"
+  fi;
+  onchange\
+    "dev$DIR$2/*.$EXT"\
+    "dev$DIR$2/**/*.$EXT"\
+    "dev$DIR$2/**/**/*.$EXT"\
+    $EXCLUDE\
+    -- run-s build:$2
+  echo "${1^} changed"
+}
+
+function serveNode() {
+  $SERVE_CMD app/server/
+}
+function serveBrowsersync() {
+  browser-sync\
+    start\
+    reload\
+    --proxy 'http://localhost:4010'\
+    --port $BRSYNC_PORT\
+    --ui-port $BRSYNC_UI_PORT\
+    --files 'app/**/*.css, app/server/**/*.js, app/static/**/*.js, app/**/*.pug'\
+    --reload-delay 500\
+    --reload-debounce 500\
+    --browser 'google chrome'
+}
+
+function start() {
+  run-s\
+    setup\
+    build:*\
+    $START_CMD
+}
+
+eval "$@"
